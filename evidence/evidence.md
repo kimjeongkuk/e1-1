@@ -210,3 +210,37 @@ drwxr-xr-x 1 root root 4096 Nov 21 02:45 ..
 --- note.txt ---
 persist-check-2026
 ```
+
+## 통합 환경 및 명령어 실행 증적
+
+### 1) 실행 환경 버전 확인 (`docker --version`, `git --version`)
+```bash
+$ docker --version && git --version
+Docker version 29.9.3, build 5457199
+git version 2.53.0
+```
+
+### 2) 루트 디렉토리 파일 및 권한 확인 (`ls -la`)
+```bash
+$ pwd && ls -la ~/projects/myapp/lab
+/home/viablevision3530/projects/myapp/lab
+total 52
+drwxr-xr-x 6 viablevision3530 viablevision3530 4096 Nov 21 16:03 .
+drwxr-xr-x 7 viablevision3530 viablevision3530 4096 Nov 19 19:03 ..
+drwxr-xr-x 7 viablevision3530 viablevision3530 4096 Nov 21 16:07 .git
+-rw-r--r-- 1 viablevision3530 viablevision3530  109 Nov 21 10:05 Dockerfile
+-rw-r--r-- 1 viablevision3530 viablevision3530 8443 Nov 21 16:56 README.md
+-rw-r--r-- 1 viablevision3530 viablevision3530    0 Nov 21 10:05 README1.md
+drwxr-xr-x 2 viablevision3530 viablevision3530 4096 Nov 21 10:05 evidence
+drwxr-xr-x 2 viablevision3530 viablevision3530 4096 Nov 21 16:54 images
+-rw-r--r-- 1 viablevision3530 viablevision3530   33 Nov 21 10:05 index.html
+-rw-r--r-- 1 viablevision3530 viablevision3530    0 Nov 21 10:05 my_file.txt
+drwxr-xr-x 2 viablevision3530 viablevision3530 4096 Nov 19 15:03 perm_dir
+-rw-r--r-- 1 viablevision3530 viablevision3530    0 Nov 21 10:05 perm_test.txt
+-rw-r--r-- 1 viablevision3530 viablevision3530 5511 Nov 21 10:05 sample
+```
+
+### 3) Docker 이미지 빌드 실행 (`docker build -t my-web-lab:v1 .`)
+```bash
+$ docker build -t my-web-lab:v1 .
+```

@@ -3,13 +3,22 @@
 ## 1. 실행 환경
 - OS / Shell: WSL2 (Ubuntu) + Docker Desktop 연동
 - 작업 경로: `~/projects/myapp/lab`
+- ![screen-1](./images/screen-1.png)
+
+<br> 
+
 - Docker Version: `Docker version 29.9.3, build 5457199`
 - Git Version: `git version 2.53.0`
+- ![screen-2](./images/screen-2.png)
+
 
 ### 1.1 디렉토리 구조 및 설계 기준
 - **설계 기준:** 실습 코드·설정 파일과 실행 증빙 로그를 분리하고, 불변 이미지/컨테이너와 마운트·볼륨 데이터를 구분해 재현성과 관리 편의성을 높이는 구조로 설계했습니다.
 - **`~/projects/myapp/lab` (루트 작업 디렉토리):** `Dockerfile`, `index.html`, 권한 실습 대상(`perm_test.txt`, `perm_dir`) 및 `README.md`를 관리하는 메인 실습 공간입니다.
 - **`evidence/` (증빙 로그 디렉토리):** `evidence/evidence.md` 등 명령어 실행 결과와 검증 로그를 모아 본문(`README.md`)의 가독성을 유지하면서 근거 자료를 보존합니다.
+
+
+- ![screen-3](./images/screen-3.png)
 
 ### 1.2 이미지와 컨테이너의 차이
 - **이미지(Image)**는 앱과 실행 환경을 담은 불변의 **실행 템플릿(저장 단위)**이며, **컨테이너(Container)**는 그 이미지를 바탕으로 메모리와 격리된 프로세스를 띄워 동작시키는 **실행 인스턴스(실행 단위)**입니다.
@@ -24,6 +33,7 @@
   - 사례: 작업 경로를 명확히 지정하거나 설명할 때 `~/projects/myapp/lab`처럼 기준 경로를 고정해 표기합니다.
 - **상대경로(`./...`, `evidence/...`, `index.html` 등) 사용 기준:** 현재 프로젝트 폴더 내부의 파일이나 하위 경로를 기준으로 이동·참조할 때 사용합니다. 다른 PC나 다른 폴더 이름으로 클론하더라도 디렉토리 구조만 같으면 그대로 동작하기 때문에 재현성과 이식성에 유리합니다.
   - 사례: `docker build -t my-web-lab:v1 .`의 빌드 컨텍스트(`.`)나 `evidence/evidence.md`, `index.html` 같은 프로젝트 내부 리소스 참조에 활용합니다.
+
 
 ### 1.5 파일 권한(rwx)과 숫자 매핑 규칙
 - 파일 권한은 읽기(`r`=4), 쓰기(`w`=2), 실행(`x`=1) 비트의 합으로 숫자를 계산하며, 소유자·그룹·기타 사용자 순서의 세 자리 숫자로 표현합니다.
@@ -42,10 +52,20 @@
 - 디렉토리(`perm_dir`): `700` (`drwx------`) -> `755` (`drwxr-xr-x`)
 - 상세 CLI 및 권한 로그: `evidence/evidence.md` 참고
 
+
+- ![screen-4](./images/1.png)
+
+
 ### 3.2 Docker 커스텀 이미지, 포트 매핑 및 데이터 관리
 - 커스텀 이미지 빌드 및 컨테이너 실행/포트 매핑 확인
 ### 3.3 Docker 이미지 및 컨테이너 목록 증거
 - `docker images` 및 `docker ps -a` 전체 출력은 `evidence/evidence.md`의 **Docker 이미지 및 컨테이너 목록 증거** 항목에 기록되어 있습니다.
+
+- ![screen-4](./images/screen-4.png)
+
+
+- ![docker image](./images/screen-4.png)
+
 
 - 바인드 마운트(`index.html` 변경 즉시 반영) 및 Docker 볼륨(컨테이너 삭제 후에도 데이터 유지) 검증
 - 접속 증거 스크린샷(준비된 이미지 파일이 있다면 아래 경로/링크로 연결):
