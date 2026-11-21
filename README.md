@@ -6,6 +6,11 @@
 - Docker Version: `Docker version 29.9.3, build 5457199`
 - Git Version: `git version 2.53.0`
 
+### 1.1 디렉토리 구조 및 설계 기준
+- **설계 기준:** 실습 코드·설정 파일과 실행 증빙 로그를 분리하고, 불변 이미지/컨테이너와 마운트·볼륨 데이터를 구분해 재현성과 관리 편의성을 높이는 구조로 설계했습니다.
+- **`~/projects/myapp/lab` (루트 작업 디렉토리):** `Dockerfile`, `index.html`, 권한 실습 대상(`perm_test.txt`, `perm_dir`) 및 `README.md`를 관리하는 메인 실습 공간입니다.
+- **`evidence/` (증빙 로그 디렉토리):** `evidence/evidence.md` 등 명령어 실행 결과와 검증 로그를 모아 본문(`README.md`)의 가독성을 유지하면서 근거 자료를 보존합니다.
+
 ## 2. 수행 항목 체크리스트
 - [x] 터미널(CLI) 기반 작업 및 디렉토리 구성
 - [x] 파일(`perm_test.txt`) 및 디렉토리(`perm_dir`) 권한 변경 전/후 비교 (`chmod`)
