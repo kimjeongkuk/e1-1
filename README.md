@@ -71,6 +71,15 @@
    - **원인/확인:** 명령을 한 줄에 붙이거나 `perm_test.txt` 대신 `perm.txt`로 입력해 `No such file or directory`가 발생함
    - **해결:** 명령어를 줄 단위로 나누어 실행하고 정확한 파일명(`perm_test.txt`, `perm_dir`)으로 권한 변경 전/후를 재확인
 
+### 포트 충돌 확인 및 해제 절차
+1. **포트 사용 여부 및 점유 주체 확인:** 충돌이 의심되는 포트(예: `8080`)를 점유 중인 Docker 컨테이너나 호스트 프로세스를 먼저 확인합니다.
+   - Docker 컨테이너 확인: `docker ps --filter "publish=8080"` 또는 `docker ps`
+   - 호스트 프로세스 확인: `ss -tulpn | grep :8080` 또는 `lsof -i :8080`
+2. **포트 해제(점유 컨테이너 중지/삭제 또는 프로세스 종료):**
+   - 해당 포트를 점유한 컨테이너가 원인인 경우: `docker stop <컨테이너명_또는_ID>` 및 필요 시 `docker rm <컨테이너명_또는_ID>`
+   - 호스트 프로세스가 점유한 경우: 확인된 `PID` 기준으로 `kill <PID>`(필요 시 `kill -9 <PID>`)
+3. **포트 해제 재확인 및 재실행:** `ss -tulpn | grep :8080`과 `docker ps`로 포트가 비워졌는지 확인한 뒤 컨테이너를 다시 시작합니다.
+
 ## 5. 재현 방법
 1. 저장소 클론: `git clone https://github.com/kimjeongkuk/e1-1.git`
 2. 작업 디렉토리 이동: `cd e1-1` (기존 실습 경로 기준 `~/projects/myapp/lab` 참고)
