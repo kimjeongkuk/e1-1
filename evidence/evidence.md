@@ -142,3 +142,18 @@ exit
 ### 권한 변경(chmod) 전/후 비교
 - 파일(`perm_test.txt`): `600` (`-rw-------`) -> `644` (`-rw-r--r--`)
 - 디렉토리(`perm_dir`): `700` (`drwx------`) -> `755` (`drwxr-xr-x`)
+]633;E;echo "";cc1b494a-5bd5-49f4-a91b-372902703200]633;C
+### Docker 이미지 및 컨테이너 목록 증거 (`docker images`, `docker ps -a`)
+```bash
+$ docker images
+IMAGE                ID             DISK USAGE   CONTENT SIZE   EXTRA
+hello-world:latest   1e4c05b897a7       25.9kB         9.49kB   U    
+my-web-lab:v1        04e5e109d9b7        177MB         43.3MB        
+my-web:1.0           af3a6422bf29        177MB         43.3MB        
+ubuntu:latest        d66b366dac61        163MB         45.9MB   U    
+
+$ docker ps -a
+CONTAINER ID   IMAGE         COMMAND    CREATED        STATUS                    PORTS     NAMES
+c835ba128675   ubuntu        "bash"     44 hours ago   Exited (0) 43 hours ago             my-ubuntu
+920afec8802e   hello-world   "/hello"   44 hours ago   Exited (0) 44 hours ago             pedantic_darwin
+```
