@@ -157,3 +157,8 @@ CONTAINER ID   IMAGE         COMMAND    CREATED        STATUS                   
 c835ba128675   ubuntu        "bash"     44 hours ago   Exited (0) 43 hours ago             my-ubuntu
 920afec8802e   hello-world   "/hello"   44 hours ago   Exited (0) 44 hours ago             pedantic_darwin
 ```
+]633;E;echo "";cc1b494a-5bd5-49f4-a91b-372902703200]633;C
+### Docker 이미지 빌드 증거 (`docker build -t`)
+```bash
+$ docker build -t my-web-lab:v1 .
+```
