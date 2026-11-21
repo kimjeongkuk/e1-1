@@ -139,3 +139,6 @@ root@ee780d13d5ac:/# exit
 exit
 
 #### **[단계 3] 커스텀 Dockerfile 및 포트 매핑**
+### 권한 변경(chmod) 전/후 비교
+- 파일(`perm_test.txt`): `600` (`-rw-------`) -> `644` (`-rw-r--r--`)
+- 디렉토리(`perm_dir`): `700` (`drwx------`) -> `755` (`drwxr-xr-x`)
