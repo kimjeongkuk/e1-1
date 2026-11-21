@@ -32,6 +32,10 @@
 - 태그 지정 빌드 명령: `docker build -t my-web-lab:v1 .`
 - 상세 빌드 출력 로그(성공 및 태그 확인): `evidence/evidence.md`의 **Docker 이미지 빌드 증거** 항목 참고
 
+### 3.5 호스트 포트 접속 검증 증거
+- 접속 확인 명령: `curl -i http://localhost:8080`
+- 전체 HTTP 응답 헤더 및 본문 로그: `evidence/evidence.md`의 **호스트 포트 접속 검증 증거** 항목 참고
+
 ## 4. 트러블슈팅
 1. **문제:** `git push` 시 원격 이력 충돌(`fetch first`) 발생
    - **원인/확인:** 원격 저장소(`e1-1`)에 먼저 생성된 파일 이력이 있어 로컬과 커밋 히스토리가 갈라짐

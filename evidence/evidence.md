@@ -162,3 +162,29 @@ c835ba128675   ubuntu        "bash"     44 hours ago   Exited (0) 43 hours ago  
 ```bash
 $ docker build -t my-web-lab:v1 .
 ```
+]633;E;echo "";cc1b494a-5bd5-49f4-a91b-372902703200]633;C
+### 호스트 포트 접속 검증 증거 (`curl -i http://localhost:8080`)
+```bash
+$ curl -i http://localhost:8080
+HTTP/1.0 200 OK
+Server: SimpleHTTP/0.6 Python/3.12.16
+Date: Sat, 21 Nov 2026 02:38:34 GMT
+Content-type: text/html
+Content-Length: 33
+Last-Modified: Sat, 21 Nov 2026 01:05:40 GMT
+
+<h1>Updated via Bind Mount!</h1>
+```
+]633;E;echo "";cc1b494a-5bd5-49f4-a91b-372902703200]633;C
+### 호스트 포트 접속 검증 증거 (`curl -i http://localhost:8080`)
+```bash
+$ curl -i http://localhost:8080
+HTTP/1.0 200 OK
+Server: SimpleHTTP/0.6 Python/3.12.16
+Date: Sat, 21 Nov 2026 02:39:01 GMT
+Content-type: text/html
+Content-Length: 33
+Last-Modified: Sat, 21 Nov 2026 01:05:40 GMT
+
+<h1>Updated via Bind Mount!</h1>
+```
