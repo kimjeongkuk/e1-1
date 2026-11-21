@@ -188,3 +188,25 @@ Last-Modified: Sat, 21 Nov 2026 01:05:40 GMT
 
 <h1>Updated via Bind Mount!</h1>
 ```
+
+### 볼륨 마운트 및 컨테이너 삭제 전·후 파일 비교 증거
+```bash
+# [1] 컨테이너 삭제 전 볼륨 내 파일 목록 및 내용
+total 12
+drwxr-xr-x 2 root root 4096 Nov 21 02:45 .
+drwxr-xr-x 1 root root 4096 Nov 21 02:45 ..
+-rw-r--r-- 1 root root   19 Nov 21 02:45 note.txt
+--- note.txt ---
+persist-check-2026
+
+# [2] 컨테이너 삭제
+vol-check-ctr
+
+# [3] 컨테이너 삭제 후 새 컨테이너(또는 임시 컨테이너)로 동일 볼륨 재마운트 후 비교
+total 12
+drwxr-xr-x 2 root root 4096 Nov 21 02:45 .
+drwxr-xr-x 1 root root 4096 Nov 21 02:45 ..
+-rw-r--r-- 1 root root   19 Nov 21 02:45 note.txt
+--- note.txt ---
+persist-check-2026
+```
