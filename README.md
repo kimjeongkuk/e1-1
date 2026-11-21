@@ -57,4 +57,12 @@
 1. 저장소 클론: `git clone https://github.com/kimjeongkuk/e1-1.git`
 2. 작업 디렉토리 이동: `cd e1-1` (기존 실습 경로 기준 `~/projects/myapp/lab` 참고)
 3. Docker 이미지 빌드: `docker build -t my-web-lab:v1 .`
-4. 포트 매핑 및 마운트/볼륨 옵션으로 컨테이너 실행 후 동작 확인
+4. 포트(`-p`) 및 볼륨(`-v`) 매핑 옵션으로 컨테이너 실행:
+   - 포트 매핑: `-p 8080:8000` (호스트 `8080` 포트 -> 컨테이너 `8000` 포트, 앱 내부 포트에 맞춰 조정)
+   - 영속 볼륨 매핑: `-v lab-vol:/data` (`lab-vol` 볼륨을 컨테이너 `/data` 경로에 마운트)
+   - 실행 명령 예시:
+     ```bash
+     docker volume create lab-vol
+     docker run -d --name my-web-lab-ctr -p 8080:8000 -v lab-vol:/data my-web-lab:v1
+     ```
+5. 동작 확인: `curl -i http://localhost:8080` 및 컨테이너 삭제 후 `lab-vol` 데이터 유지 여부 확인
