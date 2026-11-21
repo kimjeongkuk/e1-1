@@ -9,6 +9,9 @@
 
 - Docker Version: `Docker version 29.9.3, build 5457199`
 - Git Version: `git version 2.53.0`
+
+- ![screen-2](./7.png)
+
 - ![screen-2](./images/screen-2.png)
 
 
@@ -30,6 +33,9 @@
 
 ### 1.4 절대경로와 상대경로 선택 기준
 - **절대경로(`/...` 또는 `~/...`) 사용 기준:** 현재 작업 디렉토리(`pwd`)가 어디인지와 무관하게 기준 위치를 고정해야 할 때 사용합니다.
+
+- ![screen-2](./images/8.png)
+
   - 사례: 작업 경로를 명확히 지정하거나 설명할 때 `~/projects/myapp/lab`처럼 기준 경로를 고정해 표기합니다.
 - **상대경로(`./...`, `evidence/...`, `index.html` 등) 사용 기준:** 현재 프로젝트 폴더 내부의 파일이나 하위 경로를 기준으로 이동·참조할 때 사용합니다. 다른 PC나 다른 폴더 이름으로 클론하더라도 디렉토리 구조만 같으면 그대로 동작하기 때문에 재현성과 이식성에 유리합니다.
   - 사례: `docker build -t my-web-lab:v1 .`의 빌드 컨텍스트(`.`)나 `evidence/evidence.md`, `index.html` 같은 프로젝트 내부 리소스 참조에 활용합니다.
@@ -53,13 +59,22 @@
 - 상세 CLI 및 권한 로그: `evidence/evidence.md` 참고
 
 
+
 - ![screen-4](./images/1.png)
 
+
+- ![screen-4](./images/6.png)
 
 ### 3.2 Docker 커스텀 이미지, 포트 매핑 및 데이터 관리
 - 커스텀 이미지 빌드 및 컨테이너 실행/포트 매핑 확인
 ### 3.3 Docker 이미지 및 컨테이너 목록 증거
 - `docker images` 및 `docker ps -a` 전체 출력은 `evidence/evidence.md`의 **Docker 이미지 및 컨테이너 목록 증거** 항목에 기록되어 있습니다.
+
+- ![screen-4](./images/2.png)
+
+- ![screen-4](./images/3.png)
+
+
 
 - ![screen-4](./images/screen-4.png)
 
@@ -75,9 +90,17 @@
 - 태그 지정 빌드 명령: `docker build -t my-web-lab:v1 .`
 - 상세 빌드 출력 로그(성공 및 태그 확인): `evidence/evidence.md`의 **Docker 이미지 빌드 증거** 항목 참고
 
+- ![screen-4](./images/4.png)
+
+
 ### 3.5 호스트 포트 접속 검증 증거
 - 접속 확인 명령: `curl -i http://localhost:8080`
 - 전체 HTTP 응답 헤더 및 본문 로그: `evidence/evidence.md`의 **호스트 포트 접속 검증 증거** 항목 참고
+
+
+- ![screen-4](./images/5.png)
+
+
 
 ### 3.6 볼륨 마운트 및 컨테이너 삭제 후 데이터 유지 검증
 - 검증 방식: 명명된 볼륨에 파일 생성 후 컨테이너 삭제(`docker rm -f`), 새 컨테이너에서 동일 볼륨 마운트 후 파일 목록 및 내용 비교
@@ -112,4 +135,7 @@
      docker volume create lab-vol
      docker run -d --name my-web-lab-ctr -p 8080:8000 -v lab-vol:/data my-web-lab:v1
      ```
+
+- ![screen-4](./images/9.png)
+
 5. 동작 확인: `curl -i http://localhost:8080` 및 컨테이너 삭제 후 `lab-vol` 데이터 유지 여부 확인
