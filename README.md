@@ -38,14 +38,14 @@ git version 2.53.0
 
 ## 3. 수행 체크리스트
 
-- [x] 터미널 기본 조작 (pwd / ls -la / mkdir / touch / cp / mv / rm / cat)
+- [x] 터미널 기본 조작 (pwd / ls -la / cd / mkdir / touch / cp / mv / rm / cat)
 - [x] 권한 변경 실습 (파일 1, 디렉토리 1, 전/후 비교)
 - [x] Docker 버전 확인
 - [x] `docker info` 데몬 점검
 - [x] 이미지/컨테이너 목록 (`docker images`, `docker ps`, `docker ps -a`, `docker stop`)
 - [x] `docker logs`, `docker stats`
 - [x] hello-world 실행
-- [x] ubuntu 컨테이너 진입 및 명령 수행
+- [x] ubuntu 컨테이너 실행 및 명령 수행
 - [x] attach / exec 차이 관찰·정리
 - [x] Dockerfile 커스텀 이미지 빌드/실행
 - [x] 포트 매핑 접속 (8080, 8081 두 포트)
@@ -59,7 +59,7 @@ git version 2.53.0
 
 | 항목 | 명령 | 확인한 내용 | 위치 |
 |---|---|---|---|
-| 터미널 조작 | `pwd` `ls -la` `mkdir` `touch` `cat` `cp` `mv` `rm` | 생성/복사/이동/삭제, 디렉토리 `-r` 오류 | [5.1](#51-터미널-기본-조작) |
+| 터미널 조작 | `pwd` `ls -la` `cd` `mkdir` `touch` `cat` `cp` `mv` `rm` | 이동/생성/복사/삭제, 디렉토리 `-r` 오류 | [5.1](#51-터미널-기본-조작) |
 | 권한 | `ls -l` → `chmod 600/700` → `ls -l` | 변경 전/후 권한 문자열 | [5.2](#52-권한-변경-전후) |
 | Docker 점검 | `docker --version` `docker info` | 클라이언트/데몬 정상 응답 | [5.3](#53-docker-설치와-점검) |
 | 컨테이너 실습 | `docker run hello-world` / ubuntu | 실행 성공, 내부 명령 수행 | [5.4](#54-hello-world-실행), [5.5](#55-ubuntu-컨테이너-실습) |
@@ -149,15 +149,26 @@ drwxr-xr-x 2 user user  4096 Nov 23 20:10 images
 drwxr-xr-x 2 user user  4096 Nov 19 15:03 perm_dir
 ```
 
+디렉토리 이동(`cd`):
+
+```bash
+$ cd evidence && pwd
+/home/user/projects/myapp/lab/evidence
+$ cd .. && pwd
+/home/user/projects/myapp/lab
+```
+
 ### 5.2 권한 변경 전후
 
 **디렉토리**
+
 ```bash
-$ ls -ld my_dir
-drwxr-xr-x 2 user user 4096 Nov 10 14:56 my_dir      # 변경 전 (755)
-$ chmod 700 my_dir
-$ ls -ld my_dir
-drwx------ 2 user user 4096 Nov 10 14:56 my_dir      # 변경 후 (700)
+$ chmod 755 perm_dir
+$ ls -ld perm_dir
+drwxr-xr-x 2 user user 4096 Nov 19 15:03 perm_dir
+$ chmod 700 perm_dir
+$ ls -ld perm_dir
+drwx------ 2 user user 4096 Nov 19 15:03 perm_dir
 ```
 
 **파일**
@@ -173,7 +184,7 @@ $ ls -l my_file.txt
 | 대상 | 변경 전 | 변경 후 |
 |---|---|---|
 | `my_file.txt` | `644` (`-rw-r--r--`) | `600` (`-rw-------`) |
-| `my_dir` | `755` (`drwxr-xr-x`) | `700` (`drwx------`) |
+| `perm_dir` | `755` (`drwxr-xr-x`) | `700` (`drwx------`) |
 
 ### 5.3 Docker 설치와 점검
 
@@ -210,27 +221,57 @@ Server:
 ### 5.4 hello-world 실행
 
 ```bash
-$ docker run hello-world
-Unable to find image 'hello-world:latest' locally
-latest: Pulling from library/hello-world
-Status: Downloaded newer image for hello-world:latest
+$ docker run --rm hello-world
 
 Hello from Docker!
 This message shows that your installation appears to be working correctly.
-...
+
+To generate this message, Docker took the following steps:
+ 1. The Docker client contacted the Docker daemon.
+ 2. The Docker daemon pulled the "hello-world" image from the Docker Hub.
+    (amd64)
+ 3. The Docker daemon created a new container from that image which runs the
+    executable that produces the output you are currently reading.
+ 4. The Docker daemon streamed that output to the Docker client, which sent it
+    to your terminal.
+
+To try something more ambitious, you can run an Ubuntu container with:
+ $ docker run -it ubuntu bash
+
+Share images, automate workflows, and more with a free Docker ID:
+ https://hub.docker.com/
+
+For more examples and ideas, visit:
+ https://docs.docker.com/get-started/
 ```
 
 ### 5.5 ubuntu 컨테이너 실습
 
+컨테이너를 실행해 내부에서 `ls`, `whoami`, `echo`를 수행했습니다.
+
 ```bash
-$ docker run -it --name my-ubuntu ubuntu bash
-root@<container-id>:/# ls
-bin  boot  dev  etc  home  lib  lib64  media  mnt  opt  proc  root  run  sbin  srv  sys  tmp  usr  var
-root@<container-id>:/# whoami
+$ docker run --rm ubuntu bash -c 'ls; whoami; echo "codyssey mission"'
+bin
+boot
+dev
+etc
+home
+lib
+lib64
+media
+mnt
+opt
+proc
 root
-root@<container-id>:/# echo "codyssey mission"
+run
+sbin
+srv
+sys
+tmp
+usr
+var
+root
 codyssey mission
-root@<container-id>:/# exit
 ```
 
 ### 5.6 attach와 exec 차이
@@ -462,14 +503,20 @@ init.defaultbranch=main
 $ git remote -v
 origin  https://github.com/kimjeongkuk/e1-1.git (fetch)
 origin  https://github.com/kimjeongkuk/e1-1.git (push)
+```
 
+최근 커밋 이력:
+
+```bash
 $ git log --oneline -n 5
-b51af00 (HEAD -> main, origin/main, origin/HEAD) Update README with completed Docker tasks
-28817e6 Update README.md
-53bca34 README update
-d56e781 update
-82cd155 update
+1209b05 Docs: README 전체 정리 및 증적 보완
+f8a110d Docs: README TODO 정리 및 증적 반영
+28615b8 Docs: README TODO 정리 및 증적 보완
+5115c20 Docs: 실행 증적 및 로그 추가
+b51af00 Update README with completed Docker tasks
+```
 
+```bash
 $ git push origin main
 Writing objects: 100% (4/4), 757 bytes | 757.00 KiB/s, done.
 To https://github.com/kimjeongkuk/e1-1.git
