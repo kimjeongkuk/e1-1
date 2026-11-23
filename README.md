@@ -393,13 +393,13 @@ d56e781 update
 
 ## 6. 트러블슈팅
 
-### 6.1 `git push` 시 `fetch first` 오류
+### 6.1 컨테이너 이름 충돌 (`Conflict. The container name is already in use`)
 | 단계 | 내용 |
 |---|---|
-| 문제 | `git push` 시 원격 이력 충돌 (`! [rejected] ... (fetch first)`) |
-| 원인 가설 | 원격 저장소에 먼저 생성된 커밋이 있어 로컬과 히스토리가 갈라졌을 것 |
-| 확인 | 🔧 TODO: `git log --oneline --graph --all` 또는 `git fetch` 후 `git status` 출력 |
-| 해결 | 🔧 TODO: 실제 사용한 명령 (예: `git pull --rebase origin main` → `git push`) |
+| 문제 | `docker run --name bind-test ...` 실행 시 `Conflict. The container name "/bind-test" is already in use` 오류 |
+| 원인 가설 | 같은 이름의 컨테이너가 이미 존재(종료 상태 포함)하면 같은 이름으로 새로 만들 수 없다 |
+| 확인 | `docker ps -a`로 `bind-test`가 남아 있는지 확인 |
+| 해결 | `docker rm -f bind-test`로 삭제 후 같은 명령 재실행하여 성공 |
 
 ### 6.2 `docker rm` / `cp` 디렉토리 오류 (실제 로그)
 | 단계 | 내용 |
