@@ -1,5 +1,6 @@
 # 개발 워크스테이션 구축 미션 결과 보고서
 
+
 ## 1. 프로젝트 개요
 
 - **목표:** 터미널(CLI), Docker, Git/GitHub로 개발 워크스테이션을 직접 구축하고, "내 컴퓨터에서만 되는" 문제를 줄이는 **재현 가능한 실행 환경**을 만든다.
@@ -42,18 +43,18 @@ git version 2.53.0
 - [x] 터미널 기본 조작 (pwd / ls -la / mkdir / cp / mv / rm)
 - [x] 권한 변경 실습 (파일 1, 디렉토리 1)
 - [x] Docker 버전 확인
-- [x] 🔧 `docker info` 데몬 점검
+- [ ] 🔧 `docker info` 데몬 점검
 - [x] 이미지/컨테이너 목록 (`docker images`, `docker ps -a`)
-- [x] 🔧 `docker logs`, `docker stats`
+- [ ] 🔧 `docker logs`, `docker stats`
 - [x] hello-world 실행
 - [x] ubuntu 컨테이너 진입 및 명령 수행
-- [x] 🔧 attach / exec 차이 정리
-- [x] 🔧 Dockerfile 커스텀 이미지 빌드/실행
-- [x] 🔧 포트 매핑 접속 (8080, 8081 두 포트)
-- [x] 🔧 바인드 마운트 반영 (전/후)
-- [x] 🔧 Docker 볼륨 영속성 (명령 포함)
-- [x] 🔧 Git 설정 (`git config --list`) + VSCode GitHub 연동
-- [x] (선택) Docker Compose 등 보너스
+- [ ] 🔧 attach / exec 차이 정리
+- [ ] 🔧 Dockerfile 커스텀 이미지 빌드/실행
+- [ ] 🔧 포트 매핑 접속 (8080, 8081 두 포트)
+- [ ] 🔧 바인드 마운트 반영 (전/후)
+- [ ] 🔧 Docker 볼륨 영속성 (명령 포함)
+- [ ] 🔧 Git 설정 (`git config --list`) + VSCode GitHub 연동
+- [ ] (선택) Docker Compose 등 보너스
 
 > 완료한 항목만 `[x]`로 바꾸세요. 증거가 없는 항목에 체크하면 감점됩니다.
 
@@ -147,9 +148,33 @@ $ ls -l my_file.txt
 ```bash
 $ docker --version
 Docker version 29.9.3, build 5457199
-$ docker info
-🔧 TODO: 출력 붙여 넣기 (Server Version, Containers 등 확인)
+
+$ docker info | sed -n '/^Server:/,$p' | head -n 20
+Server:
+ Containers: 6
+  Running: 3
+  Paused: 0
+  Stopped: 3
+ Images: 4
+ Server Version: 29.9.3
+ Storage Driver: overlayfs
+  driver-type: io.containerd.snapshotter.v1
+ Logging Driver: local
+ Cgroup Driver: cgroupfs
+ Cgroup Version: 2
+ Plugins:
+  Volume: local
+  Network: bridge host ipvlan macvlan null overlay
+  Log: awslogs fluentd gcplogs gelf journald json-file local splunk syslog
+ CDI spec directories:
+  /etc/cdi
+  /var/run/cdi
+ Discovered Devices:
 ```
+
+- `Server:` 항목이 응답하므로 Docker 데몬(엔진)이 정상 동작 중입니다.
+- 클라이언트와 서버 버전이 모두 `29.9.3`으로 일치합니다.
+- 실행 중 컨테이너 3개(`my-web-8080`, `my-web-8081`과 지금 실행 중인 컨테이너)를 확인했습니다.
 
 ### 5.4 hello-world
 
@@ -164,61 +189,106 @@ This message shows that your installation appears to be working correctly.
 ...
 ```
 
-### 5.5 ubuntu 컨테이너 실습
+**attach / exec 차이 (직접 관찰)**
+
+`docker exec`는 실행 중인 컨테이너에 새 셸 프로세스를 띄워 접속합니다.
 
 ```bash
-$ docker run -it --name my-ubuntu ubuntu bash
-root@<container-id>:/# ls
-bin  boot  dev  etc  home  lib  lib64  media  mnt  opt  proc  root  run  sbin  srv  sys  tmp  usr  var
-root@<container-id>:/# whoami
-root
-root@<container-id>:/# echo "codyssey mission"
-codyssey mission
-root@<container-id>:/# exit
+$ docker run -d --name exec-demo ubuntu sleep infinity
+555637967eb1e05c4371d7a32c650c52f998bcab9c055e968767cc8dbc7e6059
+$ docker exec -it exec-demo bash
+root@555637967eb1:/# echo hello-from-exec
+hello-from-exec
+root@555637967eb1:/# exit
+exit
+$ docker ps --filter name=exec-demo
+CONTAINER ID   IMAGE    COMMAND            CREATED          STATUS          PORTS   NAMES
+555637967eb1   ubuntu   "sleep infinity"   27 seconds ago   Up 27 seconds           exec-demo
 ```
 
-**attach / exec 차이 (🔧 TODO: 직접 관찰한 내용으로 수정)**
-- `docker exec -it <이름> bash`: 실행 중인 컨테이너에 **새 프로세스**를 띄워 접속. `exit`해도 컨테이너는 유지됩니다.
-- `docker attach <이름>`: 컨테이너의 **메인 프로세스**에 붙음. 메인 셸을 `exit`하면 컨테이너도 종료됩니다.
+`docker attach`는 컨테이너의 메인 프로세스(PID 1)에 직접 붙습니다.
+
+```bash
+$ docker run -dit --name attach-demo ubuntu bash
+04cae699bf5b93a8491e38f4ea64f3b3da3dbdbdc1658cd303b471cdc79c49d0
+$ docker attach attach-demo
+root@04cae699bf5b:/# echo hello-from-attach
+hello-from-attach
+root@04cae699bf5b:/# exit
+exit
+$ docker ps -a --filter name=attach-demo
+CONTAINER ID   IMAGE    COMMAND   CREATED          STATUS                     PORTS   NAMES
+04cae699bf5b   ubuntu   "bash"    20 seconds ago   Exited (0) 6 seconds ago           attach-demo
+```
+
 
 ### 5.6 이미지/컨테이너 목록 및 운영 명령
 
 ```bash
 $ docker images
-IMAGE                ID             DISK USAGE   CONTENT SIZE
-hello-world:latest   1e4c05b897a7       25.9kB         9.49kB
-my-web-lab:v1        04e5e109d9b7        177MB         43.3MB
+IMAGE                ID             DISK USAGE   CONTENT SIZE   EXTRA
+hello-world:latest   1e4c05b897a7       25.9kB         9.49kB   U
+my-web-lab:v1        40fee8475468        177MB         43.3MB   U
 my-web:1.0           af3a6422bf29        177MB         43.3MB
-ubuntu:latest        d66b366dac61        163MB         45.9MB
+ubuntu:latest        d66b366dac61        163MB         45.9MB   U
+
+$ docker ps
+CONTAINER ID   IMAGE           COMMAND                  CREATED          STATUS          PORTS                                         NAMES
+361aa0e576c0   my-web-lab:v1   "python -m http.serv…"   17 minutes ago   Up 17 minutes   0.0.0.0:8082->8000/tcp, [::]:8082->8000/tcp   bind-test
+a803ceea632d   my-web-lab:v1   "python -m http.serv…"   23 minutes ago   Up 23 minutes   0.0.0.0:8081->8000/tcp, [::]:8081->8000/tcp   my-web-8081
+1974658bf4a6   my-web-lab:v1   "python -m http.serv…"   25 minutes ago   Up 25 minutes   0.0.0.0:8080->8000/tcp, [::]:8080->8000/tcp   my-web-8080
+
+$ docker logs bind-test
+172.17.0.1 - - [23/Nov/2026 10:43:13] "GET / HTTP/1.1" 200 -
+172.17.0.1 - - [23/Nov/2026 10:43:23] "GET / HTTP/1.1" 200 -
+
+$ docker stats --no-stream
+CONTAINER ID   NAME          CPU %   MEM USAGE / LIMIT     MEM %   NET I/O           BLOCK I/O         PIDS
+361aa0e576c0   bind-test     0.01%   17.02MiB / 15.25GiB   0.11%   1.96kB / 1.45kB   0B / 1.93MB       1
+a803ceea632d   my-web-8081   0.01%   16.51MiB / 15.25GiB   0.11%   1.82kB / 833B     0B / 1.93MB       1
+1974658bf4a6   my-web-8080   0.04%   28.34MiB / 15.25GiB   0.18%   2.94kB / 833B     24.2MB / 1.93MB   1
+
+$ docker stop bind-test
+bind-test
 
 $ docker ps -a
-CONTAINER ID   IMAGE         COMMAND    CREATED        STATUS                    NAMES
-c835ba128675   ubuntu        "bash"     44 hours ago   Exited (0) 43 hours ago   my-ubuntu
-920afec8802e   hello-world   "/hello"   44 hours ago   Exited (0) 44 hours ago   pedantic_darwin
-
-$ docker logs <컨테이너명>
-🔧 TODO
-$ docker stats --no-stream
-🔧 TODO
+CONTAINER ID   IMAGE           COMMAND                  CREATED          STATUS                      PORTS                                         NAMES
+361aa0e576c0   my-web-lab:v1   "python -m http.serv…"   17 minutes ago   Exited (137) 1 second ago                                                 bind-test
+a803ceea632d   my-web-lab:v1   "python -m http.serv…"   24 minutes ago   Up 24 minutes               0.0.0.0:8081->8000/tcp, [::]:8081->8000/tcp   my-web-8081
+1974658bf4a6   my-web-lab:v1   "python -m http.serv…"   25 minutes ago   Up 25 minutes               0.0.0.0:8080->8000/tcp, [::]:8080->8000/tcp   my-web-8080
+b1e98e784010   93eb0c85b703    "python -m http.serv…"   2 days ago       Exited (255) 29 minutes ago 0.0.0.0:8080->8000/tcp                        web-lab-test
+c835ba128675   ubuntu          "bash"                   4 days ago       Exited (0) 4 days ago                                                     my-ubuntu
+920afec8802e   hello-world     "/hello"                 4 days ago       Exited (0) 4 days ago                                                     pedantic_darwin
 ```
+
+- `docker ps`에서 세 컨테이너의 포트 매핑(`8080/8081/8082 → 8000`)을 확인했습니다.
+- `docker logs`의 `GET / ... 200` 두 줄은 바인드 마운트 전/후에 보낸 `curl` 요청입니다.
+- `docker stop bind-test` 후 `docker ps -a`에서 `bind-test`가 `Exited`로 바뀐 것을 확인했습니다. `Exited (137)`은 `docker stop`의 정상 종료 신호에 `python -m http.server`가 응답하지 않아 강제 종료된 코드입니다.
 
 ### 5.7 Dockerfile 커스텀 이미지
 
-- **선택 방식:** 🔧 TODO (B: Linux/Python 베이스 + 기능 추가로 보임. 실제 Dockerfile 기준으로 확정)
-- **베이스 이미지:** 🔧 TODO (예: `python:3.12-...`, 로그상 `SimpleHTTP/0.6 Python/3.12`로 서빙됨)
+- **선택 방식:** (B) Linux/Python 베이스 이미지 + 기능 추가
+- **베이스 이미지:** `python:3.12-slim`
 
-```dockerfile
-🔧 TODO: `cat Dockerfile` 결과를 그대로 붙여 넣기
+```bash
+$ cat Dockerfile
+FROM python:3.12-slim
+WORKDIR /app
+COPY index.html .
+EXPOSE 8000
+CMD ["python", "-m", "http.server", "8000"]
 ```
 
 | 커스텀 포인트 | 목적 |
 |---|---|
-| 🔧 TODO (예: `COPY index.html`) | 🔧 TODO |
-| 🔧 TODO (예: `EXPOSE`, `CMD`) | 🔧 TODO |
+| `FROM python:3.12-slim` | 가벼운 공식 Python 이미지를 베이스로 사용 |
+| `WORKDIR /app` | 컨테이너 안의 작업 디렉토리를 `/app`으로 지정 |
+| `COPY index.html .` | 호스트의 `index.html`을 `/app/index.html`로 복사해 서빙할 콘텐츠로 포함 |
+| `EXPOSE 8000` | 컨테이너가 8000 포트를 사용함을 명시 |
+| `CMD ["python", "-m", "http.server", "8000"]` | 컨테이너 시작 시 `/app`을 서빙하는 웹 서버 실행 |
 
 ```bash
-$ docker build -t my-web-lab:v1 .
-🔧 TODO: 빌드 전체 출력 (Successfully built / naming to ... 확인)
+$ docker build --progress=plain -t my-web-lab:v1 . 2>&1 | tail -n 20
 ```
 
 ### 5.8 포트 매핑 접속 (2회)
@@ -235,18 +305,25 @@ Content-Length: 33
 
 $ docker run -d -p 8081:<컨테이너포트> --name my-web-8081 my-web-lab:v1
 $ curl -i http://localhost:8081
-🔧 TODO: 두 번째 포트 응답
-```
 
-![포트 8080 브라우저 접속 (주소창 포함)](images/port-8080.png)
-*🔧 TODO: 위 이미지는 `http://localhost:8080` 주소창과 응답 화면이 함께 보이는 캡처로 교체*
+```bash
+$ docker run -d -p 8080:8000 --name my-web-8080 my-web-lab:v1
+$ curl -i http://localhost:8080
+HTTP/1.0 200 OK
+...
+$ docker run -d -p 8081:8000 --name my-web-8081 my-web-lab:v1
+$ curl -i http://localhost:8081
+HTTP/1.0 200 OK
+
+```
 
 ### 5.9 바인드 마운트 (변경 전/후)
 
 ```bash
-$ docker run -d -p 8082:<컨테이너포트> -v "$(pwd)/index.html:<컨테이너 내 경로>" --name bind-test my-web-lab:v1
+$ echo '<h1>Before Bind Mount</h1>' > index.html
+$ docker run -d -p 8082:8000 -v "$(pwd)/index.html:/app/index.html" --name bind-test my-web-lab:v1
 $ curl http://localhost:8082
-🔧 TODO: 변경 전 출력
+<h1>Before Bind Mount</h1>
 $ echo '<h1>Updated via Bind Mount!</h1>' > index.html
 $ curl http://localhost:8082
 <h1>Updated via Bind Mount!</h1>
@@ -256,38 +333,63 @@ $ curl http://localhost:8082
 
 ```bash
 $ docker volume create lab-vol
+lab-vol
+
 $ docker run -d --name vol-check-ctr -v lab-vol:/data ubuntu sleep infinity
+3c61bf8f9e38efed905ebde3c8876308c5e4d9c9d2c907a4a82ea130311d0412
+
 $ docker exec vol-check-ctr bash -c 'echo persist-check-2026 > /data/note.txt'
-$ docker exec vol-check-ctr bash -c 'ls -la /data && echo "--- note.txt ---" && cat /data/note.txt'
+
+$ docker exec vol-check-ctr bash -c 'ls -la /data && cat /data/note.txt'
 total 12
--rw-r--r-- 1 root root   19 Nov 21 02:45 note.txt
---- note.txt ---
+drwxr-xr-x 2 root root 4096 Nov 21 02:45 .
+drwxr-xr-x 1 root root 4096 Nov 23 11:03 ..
+-rw-r--r-- 1 root root   19 Nov 23 11:03 note.txt
 persist-check-2026
 
 $ docker rm -f vol-check-ctr
 vol-check-ctr
 
+$ docker ps -a --filter name=vol-check-ctr
+CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
+
 $ docker run --rm -v lab-vol:/data ubuntu bash -c 'ls -la /data && cat /data/note.txt'
 total 12
--rw-r--r-- 1 root root   19 Nov 21 02:45 note.txt
+drwxr-xr-x 2 root root 4096 Nov 21 02:45 .
+drwxr-xr-x 1 root root 4096 Nov 23 11:03 ..
+-rw-r--r-- 1 root root   19 Nov 23 11:03 note.txt
 persist-check-2026
 ```
 
-> 🔧 TODO: 위 명령은 기존 출력에 맞춰 **복원한 예시**입니다. 실제로 입력했던 명령으로 맞춰 주세요.
+- 삭제 전: `vol-check-ctr`에서 `/data/note.txt`에 `persist-check-2026`을 저장했습니다.
+- 삭제 후: `docker ps -a --filter`가 빈 목록이라 컨테이너가 사라진 것을 확인했습니다.
+- 재확인: 새 컨테이너가 같은 `lab-vol`을 연결하자 파일과 내용이 그대로 남아 있었습니다.
+
 
 ### 5.11 Git 설정과 GitHub 연동
 
 ```bash
-$ git config --global user.name "<이름>"
+$ git config --global user.name "kimjeongkuk"
+$ git config --global user.email "<masked>"
 $ git config --global init.defaultBranch main
-$ git config --list
-🔧 TODO: 출력 (user.email 등 개인정보는 마스킹)
+$ git config --list | grep -E "user\.|init\.defaultbranch"
+user.name=kimjeongkuk
+user.email=<masked>
+init.defaultbranch=main
 ```
 
-![VSCode GitHub 로그인 및 저장소 연동](images/github-link.png)
-*🔧 TODO: 토큰/계정 정보가 보이지 않게 마스킹한 캡처*
+```bash
+$ git remote -v
+origin  https://github.com/kimjeongkuk/e1-1.git (fetch)
+origin  https://github.com/kimjeongkuk/e1-1.git (push)
 
----
+$ git log --oneline -n 5
+b51af00 (HEAD -> main, origin/main, origin/HEAD) Update README with completed Docker tasks
+28817e6 Update README.md
+53bca34 README update
+d56e781 update
+82cd155 update
+```
 
 ## 6. 트러블슈팅
 
