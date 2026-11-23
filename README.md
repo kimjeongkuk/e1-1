@@ -64,12 +64,12 @@ git version 2.53.0
 | Docker 점검 | `docker --version` `docker info` | 클라이언트/데몬 정상 응답 | [5.3](#53-docker-설치와-점검) |
 | 컨테이너 실습 | `docker run hello-world` / ubuntu | 실행 성공, 내부 명령 수행 | [5.4](#54-hello-world-실행), [5.5](#55-ubuntu-컨테이너-실습) |
 | attach/exec | `docker exec -it` / `docker attach` + `ps` | exec 후 Up, attach 후 Exited | [5.6](#56-attach와-exec-차이) |
-| 운영 명령 | `images` `ps` `ps -a` `logs` `stats` `stop` | 이미지/컨테이너 상태, 로그, 리소스 | [5.7](#57-이미지와-컨테이너-운영-명령) |
+| 운영 명령 | `pull` `images` `ps` `ps -a` `logs` `stats` `stop` | 이미지/컨테이너 상태, 로그, 리소스 | [5.7](#57-이미지와-컨테이너-운영-명령) |
 | 커스텀 이미지 | `docker build -t my-web-lab:v1 .` | 빌드 성공 (`naming to ... done`) | [5.8](#58-dockerfile-커스텀-이미지) |
 | 포트 매핑 | `-p 8080:8000` / `-p 8081:8000` + `curl -i` | 두 포트 모두 HTTP 200 | [5.9](#59-포트-매핑-접속) |
 | 바인드 마운트 | `-v "$(pwd)/index.html:/app/index.html"` | 호스트 수정 전/후 응답 변화 | [5.10](#510-바인드-마운트) |
 | 볼륨 영속성 | `docker volume create` / `-v lab-vol:/data` / `docker rm -f` | 컨테이너 삭제 후 데이터 유지 | [5.11](#511-볼륨-영속성) |
-| Git/GitHub | `git config --list` `git remote -v` `git log` | 설정/원격 연결 확인 | [5.12](#512-git-설정과-github-연동) |
+| Git/GitHub | `git config --list` `git remote -v` `git push` | 설정/원격 연결 확인 | [5.12](#512-git-설정과-github-연동) |
 
 ---
 
@@ -165,13 +165,14 @@ $ cd .. && pwd
 ```bash
 $ chmod 755 perm_dir
 $ ls -ld perm_dir
-drwxr-xr-x 2 user user 4096 Nov 19 15:03 perm_dir
+drwxr-xr-x 2 user user 4096 Nov 19 15:03 perm_dir     # 변경 전 (755)
 $ chmod 700 perm_dir
 $ ls -ld perm_dir
-drwx------ 2 user user 4096 Nov 19 15:03 perm_dir
+drwx------ 2 user user 4096 Nov 19 15:03 perm_dir     # 변경 후 (700)
 ```
 
 **파일**
+
 ```bash
 $ chmod 644 my_file.txt
 $ ls -l my_file.txt
@@ -247,7 +248,7 @@ For more examples and ideas, visit:
 
 ### 5.5 ubuntu 컨테이너 실습
 
-컨테이너를 실행해 내부에서 `ls`, `whoami`, `echo`를 수행했습니다.
+컨테이너를 실행해 내부에서 `ls`, `whoami`, `echo`를 수행했습니다. 컨테이너 안에 직접 들어가 명령을 실행한 기록은 [5.6](#56-attach와-exec-차이)에 있습니다.
 
 ```bash
 $ docker run --rm ubuntu bash -c 'ls; whoami; echo "codyssey mission"'
@@ -321,7 +322,6 @@ latest: Pulling from library/alpine
 Digest: sha256:f59abe656b692d901e184be3445e084786602108599d2a51d229c0f5a48c71bf
 Status: Image is up to date for alpine:latest
 docker.io/library/alpine:latest
-```
 
 $ docker images
 IMAGE                ID             DISK USAGE   CONTENT SIZE   EXTRA
@@ -359,6 +359,7 @@ c835ba128675   ubuntu          "bash"                   4 days ago       Exited 
 920afec8802e   hello-world     "/hello"                 4 days ago       Exited (0) 4 days ago         pedantic_darwin
 ```
 
+- `docker pull alpine`의 `Image is up to date`는 이미 받아 둔 이미지라는 뜻이며 오류가 아닙니다.
 - `docker ps`에서 세 컨테이너의 포트 매핑(`8080/8081/8082 → 8000`)을 확인했습니다.
 - `docker logs`의 `GET / ... 200` 두 줄은 바인드 마운트 전/후에 보낸 `curl` 요청입니다.
 - `docker stop bind-test` 후 `docker ps -a`에서 `bind-test`가 `Exited`로 바뀐 것을 확인했습니다. `Exited (137)`은 `docker stop`의 종료 신호에 `python -m http.server`가 제때 응답하지 않아 강제 종료된 코드입니다.
@@ -513,22 +514,24 @@ origin  https://github.com/kimjeongkuk/e1-1.git (fetch)
 origin  https://github.com/kimjeongkuk/e1-1.git (push)
 ```
 
-최근 커밋 이력:
-
 ```bash
-$ git log --oneline -n 5
-1209b05 Docs: README 전체 정리 및 증적 보완
-f8a110d Docs: README TODO 정리 및 증적 반영
-28615b8 Docs: README TODO 정리 및 증적 보완
-5115c20 Docs: 실행 증적 및 로그 추가
-b51af00 Update README with completed Docker tasks
-```
-
-```bash
+$ git add -A
+$ git status -sb
+## main...origin/main
+M  README.md
+$ git commit -m "Docs: 이미지 pull 및 컨테이너 내부 진입 증적 추가"
+[main 57fa37e] Docs: 이미지 pull 및 컨테이너 내부 진입 증적 추가
+ 1 file changed, 8 insertions(+)
 $ git push origin main
-Writing objects: 100% (4/4), 757 bytes | 757.00 KiB/s, done.
+Enumerating objects: 5, done.
+Counting objects: 100% (5/5), done.
+Delta compression using up to 24 threads
+Compressing objects: 100% (3/3), done.
+Writing objects: 100% (3/3), 558 bytes | 558.00 KiB/s, done.
+Total 3 (delta 2), reused 0 (delta 0), pack-reused 0 (from 0)
+remote: Resolving deltas: 100% (2/2), completed with 2 local objects.
 To https://github.com/kimjeongkuk/e1-1.git
-   5115c20..28615b8  main -> main
+   b4f0ecd..57fa37e  main -> main
 ```
 
 ![VSCode GitHub 로그인 및 저장소 연동](images/github-link.png)
