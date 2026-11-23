@@ -315,6 +315,14 @@ CONTAINER ID   IMAGE    COMMAND   CREATED          STATUS                     PO
 ### 5.7 이미지와 컨테이너 운영 명령
 
 ```bash
+$ docker pull alpine
+Using default tag: latest
+latest: Pulling from library/alpine
+Digest: sha256:f59abe656b692d901e184be3445e084786602108599d2a51d229c0f5a48c71bf
+Status: Image is up to date for alpine:latest
+docker.io/library/alpine:latest
+```
+
 $ docker images
 IMAGE                ID             DISK USAGE   CONTENT SIZE   EXTRA
 hello-world:latest   1e4c05b897a7       25.9kB         9.49kB   U
