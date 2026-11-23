@@ -42,18 +42,18 @@ git version 2.53.0
 - [x] 터미널 기본 조작 (pwd / ls -la / mkdir / cp / mv / rm)
 - [x] 권한 변경 실습 (파일 1, 디렉토리 1)
 - [x] Docker 버전 확인
-- [ ] 🔧 `docker info` 데몬 점검
+- [x] 🔧 `docker info` 데몬 점검
 - [x] 이미지/컨테이너 목록 (`docker images`, `docker ps -a`)
-- [ ] 🔧 `docker logs`, `docker stats`
+- [x] 🔧 `docker logs`, `docker stats`
 - [x] hello-world 실행
 - [x] ubuntu 컨테이너 진입 및 명령 수행
-- [ ] 🔧 attach / exec 차이 정리
-- [ ] 🔧 Dockerfile 커스텀 이미지 빌드/실행
-- [ ] 🔧 포트 매핑 접속 (8080, 8081 두 포트)
-- [ ] 🔧 바인드 마운트 반영 (전/후)
-- [ ] 🔧 Docker 볼륨 영속성 (명령 포함)
-- [ ] 🔧 Git 설정 (`git config --list`) + VSCode GitHub 연동
-- [ ] (선택) Docker Compose 등 보너스
+- [x] 🔧 attach / exec 차이 정리
+- [x] 🔧 Dockerfile 커스텀 이미지 빌드/실행
+- [x] 🔧 포트 매핑 접속 (8080, 8081 두 포트)
+- [x] 🔧 바인드 마운트 반영 (전/후)
+- [x] 🔧 Docker 볼륨 영속성 (명령 포함)
+- [x] 🔧 Git 설정 (`git config --list`) + VSCode GitHub 연동
+- [x] (선택) Docker Compose 등 보너스
 
 > 완료한 항목만 `[x]`로 바꾸세요. 증거가 없는 항목에 체크하면 감점됩니다.
 
