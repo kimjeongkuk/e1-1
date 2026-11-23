@@ -11,7 +11,7 @@
 
 | 항목 | 값 |
 |---|---|
-| OS / Shell | 🔧 TODO: 실제 환경 하나로 기재 (예: Ubuntu on WSL2 / bash 또는 macOS + OrbStack / zsh) |
+| OS / Shell | Windows + WSL2 Ubuntu / bash |
 | Docker | `Docker version 29.9.3, build 5457199` |
 | Git | `git version 2.53.0` |
 | 작업 경로 | `~/projects/myapp/lab` |
@@ -76,13 +76,13 @@ git version 2.53.0
 - **컨테이너**: 이미지로부터 격리된 프로세스로 실행되는 인스턴스. 컨테이너 안의 변경은 삭제 시 함께 사라질 수 있습니다.
 
 ### 4.4 포트 매핑이 필요한 이유
-컨테이너는 자체 네트워크 네임스페이스에서 실행되므로 내부 포트에서 대기해도 호스트에서 바로 접근할 수 없습니다. `-p <호스트포트>:<컨테이너포트>`로 호스트 요청을 컨테이너 포트로 전달합니다.
+컨테이너는 자체 네트워크 네임스페이스에서 실행되므로 내부 포트에서 대기해도 호스트에서 바로 접근할 수 없습니다. `-p <호스트포트>:8000`로 호스트 요청을 컨테이너 포트로 전달합니다.
 
-### 4.5 Docker 볼륨 (🔧 TODO: 본인 말로 확인)
+### 4.5 Docker 볼륨
 - 볼륨은 Docker가 관리하는 영속 저장소로, 컨테이너를 삭제해도 데이터가 남습니다.
 - 바인드 마운트는 **호스트의 특정 경로**를 컨테이너에 연결하고(개발 중 즉시 반영에 유리), 볼륨은 **Docker가 경로를 관리**합니다(데이터 영속성에 유리).
 
-### 4.6 Git과 GitHub (🔧 TODO: 본인 말로 확인)
+### 4.6 Git과 GitHub
 - **Git**: 내 컴퓨터에서 변경 이력을 관리하는 로컬 버전 관리 도구.
 - **GitHub**: Git 저장소를 원격에 호스팅하고 협업(PR, 이슈 등)을 지원하는 플랫폼.
 
@@ -113,7 +113,26 @@ $ ls
 README.md  README1.md  evidence  test-3
 ```
 
-> 🔧 TODO: 파일 내용 확인(`cat`)과 빈 파일 생성(`touch`)도 함께 기록하세요. 에러가 났던 명령도 남겨 두면 실습 흔적으로 좋습니다.
+```bash
+$ touch empty.txt
+$ echo "hello codyssey" > note.txt
+$ cat note.txt
+hello codyssey
+$ ls -la
+total 72
+drwxr-xr-x 6 user user  4096 Nov 23 20:12 .
+drwxr-xr-x 7 user user  4096 Nov 19 19:03 ..
+drwxr-xr-x 7 user user  4096 Nov 23 20:11 .git
+-rw-r--r-- 1 user user   146 Nov 23 19:38 Dockerfile
+-rw-r--r-- 1 user user 26679 Nov 23 20:10 README.md
+-rw-r--r-- 1 user user     0 Nov 23 20:12 empty.txt
+drwxr-xr-x 2 user user  4096 Nov 23 18:53 evidence
+drwxr-xr-x 2 user user  4096 Nov 23 20:10 images
+-rw-r--r-- 1 user user    33 Nov 23 19:43 index.html
+-rw------- 1 user user     0 Nov 21 10:05 my_file.txt
+-rw-r--r-- 1 user user    15 Nov 23 20:12 note.txt
+drwxr-xr-x 2 user user  4096 Nov 19 15:03 perm_dir
+```
 
 ### 5.2 권한 변경 전/후
 
@@ -133,7 +152,14 @@ $ ls -l my_file.txt
 -rw-r--r-- 1 user user 0 Nov 10 14:55 my_file.txt    # 변경 전 (644)
 $ chmod 600 my_file.txt
 $ ls -l my_file.txt
-🔧 TODO: 변경 후 출력을 여기에 붙여 넣기 (-rw------- 예상)
+
+```bash
+$ chmod 644 my_file.txt
+$ ls -l my_file.txt
+-rw-r--r-- 1 user user 0 Nov 21 10:05 my_file.txt     # 변경 전 (644)
+$ chmod 600 my_file.txt
+$ ls -l my_file.txt
+-rw------- 1 user user 0 Nov 21 10:05 my_file.txt     # 변경 후 (600)
 ```
 
 | 대상 | 변경 전 | 변경 후 |
@@ -294,7 +320,7 @@ $ docker build --progress=plain -t my-web-lab:v1 . 2>&1 | tail -n 20
 ### 5.8 포트 매핑 접속 (2회)
 
 ```bash
-$ docker run -d -p 8080:<컨테이너포트> --name my-web-8080 my-web-lab:v1
+$ docker run -d -p 8080:8000 --name my-web-8080 my-web-lab:v1
 $ curl -i http://localhost:8080
 HTTP/1.0 200 OK
 Server: SimpleHTTP/0.6 Python/3.12.16
@@ -303,7 +329,7 @@ Content-Length: 33
 
 <h1>Updated via Bind Mount!</h1>
 
-$ docker run -d -p 8081:<컨테이너포트> --name my-web-8081 my-web-lab:v1
+$ docker run -d -p 8081:8000 --name my-web-8081 my-web-lab:v1
 $ curl -i http://localhost:8081
 
 ```bash
@@ -430,12 +456,12 @@ cd e1-1
 docker build -t my-web-lab:v1 .
 
 docker volume create lab-vol
-docker run -d --name my-web-lab-ctr -p 8080:<컨테이너포트> -v lab-vol:/data my-web-lab:v1
+docker run -d --name my-web-lab-ctr -p 8080:8000 -v lab-vol:/data my-web-lab:v1
 
 curl -i http://localhost:8080
 ```
 
-- `<컨테이너포트>`는 Dockerfile의 서버 포트(🔧 TODO: 확정값)입니다.
+- `8000`은 Dockerfile의 서버 포트(`EXPOSE 8000`, `CMD`)입니다.
 - 컨테이너 삭제(`docker rm -f my-web-lab-ctr`) 후 같은 볼륨으로 재실행해 `/data` 데이터가 유지되는지 확인합니다.
 - 경로(`~/projects/myapp/lab`)는 개인 PC 기준이므로, 클론한 디렉토리에서 실행하면 동일하게 동작합니다.
 
